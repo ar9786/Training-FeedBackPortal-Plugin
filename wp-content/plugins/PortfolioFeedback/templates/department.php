@@ -48,10 +48,10 @@ if(isset($_POST['post_title'])){
 					<h3 class="text-center title-2">Department</h3>
 				</div>
 				<hr>
-				<form action="" method="post" novalidate="novalidate">
+				<form action="" method="post" >
 					<div class="form-group">
 						<label for="cc-payment" class="control-label mb-1">Department Name</label>
-						<input id="cc-pament" name="dept_name" type="text" class="form-control" aria-required="true" aria-invalid="false" value="">
+						<input  name="dept_name" type="text" class="form-control" required >
 					</div>
 					<div>
 						<button id="payment-button" type="submit" name="submit_trainer" class="btn btn-lg btn-info btn-block">

@@ -81,7 +81,7 @@ if(isset($qstring)){
 				<form action="" method="post" >
 					<div class="form-group">
 						<label  class="control-label mb-1">Trainer Name</label>
-						<input  name="trainer" type="text" class="form-control" >
+						<input  name="trainer" type="text" class="form-control" required>
 					</div>
 					<div>
 						<button  type="submit" name="submit_trainer" class="btn btn-lg btn-info btn-block">
@@ -105,7 +105,7 @@ if(isset($qstring)){
 			<form action="" method="post" >
 				<div class="form-group">
 					<label  class="control-label mb-1">Trainer Name</label>
-					<input  name="trainer" type="text" class="form-control" >
+					<input  name="trainer" type="text" class="form-control" required>
 				</div>
 				<div>
 					<button  type="submit" name="submit_trainer" class="btn btn-lg btn-info btn-block">
@@ -132,7 +132,7 @@ if(isset($qstring)){
 				<form action="" method="post" >
 					<div class="form-group">
 						<label  class="control-label mb-1">Question</label>
-						<input  name="depart_name" type="text" class="form-control" >
+						<input  name="depart_name" type="text" class="form-control" required>
 					</div>
 					<div>
 						<button  type="submit" name="submit_trainer" class="btn btn-lg btn-info btn-block">
@@ -158,7 +158,7 @@ if(isset($qstring)){
 				<form action="" method="post"  enctype="multipart/form-data">
 					<div class="form-group">
 						<label  class="control-label mb-1">Question</label>
-						<input  type="file" name="ques_name"  class="form-control" >
+						<input  type="file" name="ques_name"  class="form-control" required>
 					</div>
 					<div>
 						<button  type="submit" name="submit_ques_file" class="btn btn-lg btn-info btn-block">

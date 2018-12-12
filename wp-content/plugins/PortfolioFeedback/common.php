@@ -18,7 +18,7 @@ $dept_fetch = $wpdb->get_results("select * from wp_lws_departments where status=
 return $dept_fetch;
 }
 //Fetch Trainer's
-trainerFetch($wpdb);
+//trainerFetch($wpdb);
 function trainerFetch(	$wpdb){
 	$dept_fetch = $wpdb->get_results("select * from wp_lws_trainers where status=0");
 	return $dept_fetch;

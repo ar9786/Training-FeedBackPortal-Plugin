@@ -107,9 +107,31 @@ add_action( 'wp_ajax_lws_viewUserRating', 'lws_viewUserRating' );
 add_action( 'wp_ajax_nopriv_lws_viewUserRating', 'lws_viewUserRating' );
 function lws_viewUserRating() {
  global  $wpdb;
-// $sql_lws = "SELECT wp_lws_answrs.*,wp_lws_recordfeedbacks.id,wp_lws_questions.* from wp_lws_answrs inner join wp_lws_recordfeedbacks  on wp_lws_answrs.record_id = wp_lws_recordfeedbacks.id inner join wp_lws_questions on wp_lws_questions.id = wp_lws_answrs.ques_id where wp_lws_recordfeedbacks.user_id = 2 and wp_lws_recordfeedbacks.record_date = '".$_POST['date']."'";
 	$sql_lws = "SELECT wp_lws_answrs.*,wp_lws_questions.* from wp_lws_answrs inner join wp_lws_questions on wp_lws_questions.id = wp_lws_answrs.ques_id where wp_lws_answrs.record_id = '".$_POST['ids']."'";
 	$result = $wpdb->get_results($sql_lws);
 	echo json_encode($result);
 	die;
 }
+
+
+// Charts Fetch Data For Trainer
+
+add_action( 'wp_ajax_lws_trainerchart', 'lws_trainerchart' );
+add_action( 'wp_ajax_nopriv_lws_trainerchart', 'lws_trainerchart' );
+function lws_trainerchart() {
+ global  $wpdb;
+	$row_training = $wpdb->get_results("SELECT ROUND(AVG(ans.answr),2) as ratng from wp_lws_answrs ans  inner join wp_lws_recordfeedbacks rfb on rfb.id = ans.record_id where rfb.trainer = $_POST[ids]");
+	
+	if($row_training[0]->ratng == NULL){
+		$trainr_rating[] = "0";
+	}else{
+		$trainr_rating[] = $row_training[0]->ratng;
+	}
+	echo json_encode($trainr_rating);
+	die;
+}
+
+function lorem_function() {
+  return '';
+}
+add_shortcode('lorem', 'lorem_function');

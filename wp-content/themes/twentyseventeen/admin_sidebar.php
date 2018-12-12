@@ -269,7 +269,7 @@ if(isset($_POST['user_pic'])){
                                                 
                                             </div>
                                             <div class="account-dropdown__footer">
-                                                <a href="#">
+                                                <a href="<?php echo wp_logout_url( get_home_url() ); ?>">
                                                     <i class="zmdi zmdi-power"></i>Logout</a>
                                             </div>
                                         </div>

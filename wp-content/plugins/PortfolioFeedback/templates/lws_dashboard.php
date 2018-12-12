@@ -14,13 +14,15 @@ $startpage = 1;
 $nextpage = $curpage + 1;
 $previouspage = $curpage - 1;
 
-$sql_get_title = $wpdb->get_results("SELECT * FROM wp_lws_recordfeedbacks limit $start , $perpage");
-
-if(isset($_POST['post_title'])){
-	global $wpdb;
-	$sql_get_title = $wpdb->get_results("SELECT * FROM wp_lws_recordfeedbacks where dept_name like '%".$_POST['post_title']."%'");
+if(isset($_POST['user_name'])){
+	$sql_get_title = $wpdb->get_results("SELECT rbs.*,trn.user_nicename from wp_lws_recordfeedbacks rbs left join wp_users trn on trn.id = rbs.user_id where trn.user_nicename = '$_POST[user_name]' limit $start , $perpage");
+}else if(isset($_POST['post_title'])){
+	$sql_get_title = $wpdb->get_results("SELECT rbs.*,trn.name from wp_lws_recordfeedbacks rbs left join wp_lws_trainers trn on trn.id = rbs.trainer where trn.name = '$_POST[post_title]' limit $start , $perpage");
+}else{
+	$sql_get_title = $wpdb->get_results("SELECT * FROM wp_lws_recordfeedbacks limit $start , $perpage");
 }
-function getUserRatingLws($row_id,$db){
+
+function getUserRatingLws($row_id,$db){ 
 	$row_avg = $db->get_results("SELECT rfb.record_date, ROUND(AVG(ans.answr),2) as totl from wp_lws_recordfeedbacks rfb inner join wp_lws_answrs ans on rfb.id = ans.record_id where rfb.id = $row_id");
 	if(!empty($row_avg[0]->totl)){
 		return $row_avg[0]->totl;
@@ -49,10 +51,18 @@ foreach($row_training as $val){
 }?>
 <div class="container">
 	<div class="row" style="padding-left: inherit;padding: 16px;">
-		<form action="" method="POST">
-		<input type="text" autocomplete="off" placeholder="Department" name="post_title" required>
-		<input type="submit">
-		</form>
+		<div class="col-md-3">
+			<form action="" method="POST">
+			<input type="text" autocomplete="off" placeholder="Trainer Name" name="post_title" required>
+			<input type="submit">
+			</form>
+		</div>
+		<div class="col-md-3">
+			<form action="" method="POST">
+			<input type="text" autocomplete="off" placeholder="User Name" name="user_name" required>
+			<input type="submit">
+			</form>
+		</div>
 	</div>
 	
 	<?php if($sql_get_title){ ?>
@@ -112,23 +122,45 @@ foreach($row_training as $val){
 	<?php } else{ ?>
 	<p style="color:red;">No Related Data Found</p>
 	<?php } ?>
-	
-<div class="col-xl-6">
-	<div class="percent-chart">
-		<canvas id="feedbkpercent-chart"></canvas>
+	<div class="row" style="padding-left: inherit;padding: 16px;">
+		<div class="col-sm-3">
+		<h3>Indivdual Trainer Rating</h3> 
+		<select id="trainer_id" class="form-control">
+				<option value="">Select Trainer</option>
+			<?php $array_trns = trainerFetch($wpdb); foreach($array_trns as $val){ ?>
+				<option value="<?php echo $val->id; ?>"><?php echo $val->name; ?></option>
+			<?php } ?>
+			</select>
+			<div class="percent-chart">
+				<canvas id="feedbkpercent-chart"></canvas>
+			</div>
+		</div>
 	</div>
-</div>
 
 </div>
 <script src="http://localhost/HrFeedBackPortal/wp-content/themes/twentyseventeen/custom-admin-assets/vendor/chartjs/Chart.bundle.min.js"></script>
 <script>
-try {
-var ctx = document.getElementById("feedbkpercent-chart");
-    if (ctx) {
-      ctx.height = 280;
-      var myChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
+ try {
+var options1 = {
+          maintainAspectRatio: false,
+          responsive: true,
+          cutoutPercentage: 55,
+          animation: {
+            animateScale: true,
+            animateRotate: true
+          },
+          legend: {
+            display: false
+          },
+          tooltips: {
+            titleFontFamily: "Poppins",
+            xPadding: 0,
+            yPadding: 8,
+            caretPadding: 0,
+            bodyFontSize: 13
+          }
+        };
+var config =  {
           datasets: [
             {
               label: "My First dataset",
@@ -155,30 +187,34 @@ var ctx = document.getElementById("feedbkpercent-chart");
             }
           ],
           labels: <?php echo json_encode($trainr_name); ?>
-		  },
-        options: {
-          maintainAspectRatio: false,
-          responsive: true,
-          cutoutPercentage: 55,
-          animation: {
-            animateScale: true,
-            animateRotate: true
-          },
-          legend: {
-            display: false
-          },
-          tooltips: {
-            titleFontFamily: "Poppins",
-            xPadding: 0,
-            yPadding: 8,
-            caretPadding: 0,
-            bodyFontSize: 13
-          }
-        }
+		  };	
+	
+var ctx = document.getElementById("feedbkpercent-chart");
+    if (ctx) {
+      ctx.height = 280;
+      var myChart = new Chart(ctx, {
+        type: 'doughnut',
+		data: config,
+        options: options1
       });
     }
 
   } catch (error) {
     console.log(error);
 }
+jQuery('#trainer_id').change(function(){
+	ids = jQuery('#trainer_id').val();
+	trn_name =  jQuery(this).find('option:selected').text();
+var data_time = {
+	"action": "lws_trainerchart",
+	"ids" : ids
+	},
+	ajaxurl = "<?php echo admin_url("admin-ajax.php") ?>";
+		jQuery.post(ajaxurl, data_time, function(response) {
+			var json = JSON.parse(response);
+			config.datasets[0].data = json;
+			config.labels[0] = trn_name;
+			window.myChart.update();
+	});
+});
 </script>
